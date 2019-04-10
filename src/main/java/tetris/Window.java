@@ -13,8 +13,7 @@ public class Window extends JPanel {
     Window(Input input) {
         addKeyListener(input);
         setFocusable(true);
-        setLayout(null);
-        setBackground(Color.CYAN);
+        setLayout(null);        
     }
     
     @Override

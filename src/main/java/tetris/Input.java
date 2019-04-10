@@ -22,6 +22,10 @@ public class Input implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (Tetris.replaying) {
+            return;
+        }
+        
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT) {

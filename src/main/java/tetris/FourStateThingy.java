@@ -19,6 +19,27 @@ public abstract class FourStateThingy extends Thingy {
     public abstract void generate3(ArrayList<Rectangle> ra, Rectangle r);
     
     @Override
+    public Thingy copy() {
+        FourStateThingy t;
+        switch (getName()) {
+            case 'J':
+                t = new J();
+                break;
+            case 'T':
+                t = new T();
+                break;
+            case 'L':
+                t = new L();
+                break;   
+            default:
+                t = new J();  
+        }
+        t.recs = copy(recs);
+        t.state = state;
+        return t;
+    }
+
+    @Override
     public void rotate() {
         ArrayList<Rectangle> nr = new ArrayList<>();
         Rectangle r = recs.get(0);

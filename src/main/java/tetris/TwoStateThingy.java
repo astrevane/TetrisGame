@@ -12,6 +12,27 @@ public abstract class TwoStateThingy extends Thingy {
         lays = true;
         generate(recs, null);
     }
+
+    @Override
+    public Thingy copy() {
+        TwoStateThingy t;
+        switch (getName()) {
+            case 'I':
+                t = new I();
+                break;
+            case 'S':
+                t = new S();
+                break;
+            case 'Z':
+                t = new Z();
+                break;   
+            default:
+                t = new I();  
+        }
+        t.recs = copy(recs);
+        t.lays = lays;
+        return t;
+    }
     
     public abstract void generate(ArrayList<Rectangle> ra, Rectangle r);
     public abstract void generate1(ArrayList<Rectangle> ra, Rectangle r);

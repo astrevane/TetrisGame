@@ -8,11 +8,8 @@ import java.util.ArrayList;
 public class Z extends TwoStateThingy {
     
     @Override
-    public Thingy copy() {
-        Z t = new Z();
-        t.recs = copy(recs);
-        t.lays = lays;
-        return t;
+    public char getName() {
+        return 'Z';
     }
     
     @Override

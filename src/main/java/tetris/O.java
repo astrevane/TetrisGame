@@ -1,7 +1,6 @@
 package tetris;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 
 
 public class O extends Thingy {
@@ -9,6 +8,11 @@ public class O extends Thingy {
     @Override
     public void rotate() {
        
+    }
+
+    @Override
+    public char getName() {
+        return 'O';
     }
     
     @Override

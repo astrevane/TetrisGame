@@ -7,11 +7,8 @@ import java.util.ArrayList;
 public class S extends TwoStateThingy {
     
     @Override
-    public Thingy copy() {
-        S t = new S();
-        t.recs = copy(recs);
-        t.lays = lays;
-        return t;
+    public char getName() {
+        return 'S';
     }
     
     @Override

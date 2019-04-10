@@ -11,11 +11,8 @@ import java.util.ArrayList;
 public class I extends TwoStateThingy {
     
     @Override
-    public Thingy copy() {
-        I t = new I();
-        t.recs = copy(recs);
-        t.lays = lays;
-        return t;
+    public char getName() {
+        return 'I';
     }
     
     @Override

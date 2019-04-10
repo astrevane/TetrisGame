@@ -9,11 +9,8 @@ import java.util.ArrayList;
 public class T extends FourStateThingy {
     
     @Override
-    public Thingy copy() {
-        T t = new T();
-        t.recs = copy(recs);
-        t.state = state;
-        return t;
+    public char getName() {
+        return 'T';
     }
     
     public void generate(ArrayList<Rectangle> ra, Rectangle r) {

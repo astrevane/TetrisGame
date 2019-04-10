@@ -11,12 +11,17 @@ public abstract class Thingy {
     public ArrayList<Rectangle> recs;
     public Color color;
     public boolean dropped;
-    
+    public long id;
+    static long nextId = 0;
+
     Thingy() {
         dropped = true;
         recs = new ArrayList<>();
         color = Generator.getColor();
+        id = nextId++;
     }
+
+    public abstract char getName();
     
     public abstract Thingy copy();    
     
@@ -124,6 +129,9 @@ public abstract class Thingy {
         do {
             drop();
         } while (dropped);
+        if (Tetris.replaying) {
+            dropped = true;
+        }
     }
     
     public void drop() {
