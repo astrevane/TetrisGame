@@ -16,7 +16,7 @@ class RecPos {
 public class State {
     public ArrayList<RecPos> recpos;
     public char type;
-    public long currId;
+    public int currId;
 
     State(Thingy curr) {      
         type = curr.getName();   
@@ -25,8 +25,6 @@ public class State {
         for (Rectangle r : curr.recs) {
             recpos.add(new RecPos(r.x, r.y));
         }
-        
-        
     }
 
     Thingy getThingy() {

@@ -11,8 +11,8 @@ public abstract class Thingy {
     public ArrayList<Rectangle> recs;
     public Color color;
     public boolean dropped;
-    public long id;
-    static long nextId = 0;
+    public int id;
+    static int nextId = 0;
     public char state;
 
     Thingy() {
@@ -51,7 +51,7 @@ public abstract class Thingy {
                 t = new Z();
                 break;   
             default:
-                t = new I(); 
+                t = new O(); 
         }
         return t;
     }

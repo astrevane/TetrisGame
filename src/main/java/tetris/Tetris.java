@@ -43,7 +43,8 @@ public class Tetris implements ActionListener {
     static final int BUTTON_W = 150;
     static final int BUTTON_H = 50;
     static JLabel[] highScores;
-    static JButton play1, play2, play3, goBack;
+    static JButton goBack;
+    static JButton[] replayScore;
 
     Tetris() {
         input = new Input();
@@ -93,13 +94,22 @@ public class Tetris implements ActionListener {
         goBack.addActionListener(this);
         goBack.setActionCommand("menu");
         window.add(goBack);
-        highScores = new JLabel[10];        
+        highScores = new JLabel[10];     
+        replayScore = new JButton[10];   
         for (int i = 0; i < 10; ++i) {
             highScores[i] = new JLabel();
             highScores[i].setFont(new Font("Arial", Font.BOLD, 18));
             highScores[i].setBounds(W / 2, (i + 1) * 30, W / 2, 30);
             highScores[i].setText("0");   
+            replayScore[i] = new JButton();
+            replayScore[i].setLocation(10, (i + 1) * 30);
+            replayScore[i].setSize(BUTTON_W, 30);
+            replayScore[i].setText("Replay");
+            replayScore[i].setBackground(Color.PINK);
+            replayScore[i].addActionListener(this);
+            replayScore[i].setActionCommand("score" + (i + 1));
             window.add(highScores[i]);
+            window.add(replayScore[i]);
         }
         hideMenu();
     }
@@ -109,6 +119,13 @@ public class Tetris implements ActionListener {
         String action = e.getActionCommand();
         if (action == null) {
             action = "";
+        }
+        for (int i = 1; i <= 10; ++i) {
+            if (action.equals("score" + i)) {
+                db.loadGame(i - 1);
+                startGame(true);
+                return;
+            }
         }
         if (action.equals("play")) {
             startGame(false);
@@ -122,7 +139,7 @@ public class Tetris implements ActionListener {
         } else if (action.equals("menu")) {
             showMenu();
             return;
-        }
+        }        
         if (replaying) {
             Thingy newCurr = db.getThingy();
             if (newCurr == null) {
@@ -183,6 +200,8 @@ public class Tetris implements ActionListener {
             highScores[i].setText(db.highScores.get(i) + "");
             highScores[i].setVisible(true);
             highScores[i].setEnabled(true);
+            replayScore[i].setVisible(true);
+            replayScore[i].setEnabled(true);
         }
         goBack.setEnabled(true);
         goBack.setVisible(true);
@@ -192,6 +211,10 @@ public class Tetris implements ActionListener {
         for (JLabel l : highScores) {
             l.setVisible(false);
         }        
+        for (JButton b : replayScore) {
+            b.setVisible(false);
+            b.setEnabled(false);
+        }
         label.setEnabled(false);
         label.setVisible(false);
         goBack.setEnabled(false);
@@ -221,6 +244,10 @@ public class Tetris implements ActionListener {
         goBack.setVisible(false);
         for (JLabel l : highScores) {
             l.setVisible(false);
+        }
+        for (JButton b : replayScore) {
+            b.setVisible(false);
+            b.setEnabled(false);
         }
     }
 
@@ -305,11 +332,9 @@ public class Tetris implements ActionListener {
         }
         timer = new Timer(refreshTime, this);
         timer.start();
-        o("start");
     }
 
     void stopGame() {
-        o("stop");
         timer.stop();
         if (!replaying) {
             db.saveGame();
