@@ -13,8 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
-
-public class Tetris implements ActionListener{
+public class Tetris implements ActionListener {
 
     static public void o(String s) {
         System.out.println(s);
@@ -25,16 +24,16 @@ public class Tetris implements ActionListener{
     static JFrame frame;
     static Window window;
     static Timer timer;
-    static int delay;    
+    static int delay;
     static final int refreshTime = 100;
     static int ticks;
     static int tempRefreshSum;
     static boolean dropAuto;
-    static Thingy curr;    
+    static Thingy curr;
     static Thingy shadow;
     static ArrayList<Thingy> placed;
     static Input input;
-    static long score;
+    static int score;
     static JLabel label;
     static Mongo db;
     static public boolean replaying;
@@ -43,9 +42,10 @@ public class Tetris implements ActionListener{
     static JButton replay;
     static final int BUTTON_W = 150;
     static final int BUTTON_H = 50;
+    static JLabel[] highScores;
+    static JButton play1, play2, play3, goBack;
 
-    
-    Tetris() {    
+    Tetris() {
         input = new Input();
         frame = new JFrame();
         window = new Window(input);
@@ -54,7 +54,7 @@ public class Tetris implements ActionListener{
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true); 
+        frame.setVisible(true);
         placed = new ArrayList<>();
         db = new Mongo();
         label = new JLabel("SCORE: " + score);
@@ -85,9 +85,25 @@ public class Tetris implements ActionListener{
         window.add(play);
         window.add(replay);
         window.add(highScore);
+        goBack = new JButton();
+        goBack.setText("Back");
+        goBack.setSize(BUTTON_W, BUTTON_H);
+        goBack.setLocation(W / 2 - BUTTON_W / 2, H - 50 - BUTTON_H);
+        goBack.setBackground(Color.PINK);
+        goBack.addActionListener(this);
+        goBack.setActionCommand("menu");
+        window.add(goBack);
+        highScores = new JLabel[10];        
+        for (int i = 0; i < 10; ++i) {
+            highScores[i] = new JLabel();
+            highScores[i].setFont(new Font("Arial", Font.BOLD, 18));
+            highScores[i].setBounds(W / 2, (i + 1) * 30, W / 2, 30);
+            highScores[i].setText("0");   
+            window.add(highScores[i]);
+        }
         hideMenu();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
@@ -95,14 +111,16 @@ public class Tetris implements ActionListener{
             action = "";
         }
         if (action.equals("play")) {
-            hideMenu();
             startGame(false);
             return;
         } else if (action.equals("replay")) {
-            hideMenu();
             startGame(true);
             return;
         } else if (action.equals("highscore")) {
+            showScores();
+            return;
+        } else if (action.equals("menu")) {
+            showMenu();
             return;
         }
         if (replaying) {
@@ -135,36 +153,63 @@ public class Tetris implements ActionListener{
         tempRefreshSum += refreshTime;
         if (tempRefreshSum >= delay) {
             tempRefreshSum = 0;
-            if (dropAuto && !replaying) {                
-                curr.drop();        
+            if (dropAuto && !replaying) {
+                curr.drop();
             }
             dropAuto = true;
-        } 
+        }
         increaseSpeed();
-        removeLevels();        
+        removeLevels();
         if (!replaying) {
             db.addThingy(curr);
         }
         if (!curr.dropped) {
             placed.add(curr);
             spawn(null);
-        }    
+        }
         window.repaint();
     }
 
+    static void showScores() {
+        hideMenu();
+        window.setBackground(Color.WHITE);
+        placed = new ArrayList<>();
+        curr = shadow = null;
+        label.setEnabled(false);
+        label.setVisible(false);
+        db.loadHighScore();
+        int size = db.highScores.size();
+        for (int i = 0; i < size; ++i) {
+            highScores[i].setText(db.highScores.get(i) + "");
+            highScores[i].setVisible(true);
+            highScores[i].setEnabled(true);
+        }
+        goBack.setEnabled(true);
+        goBack.setVisible(true);
+    }
+
     static void showMenu() {
+        for (JLabel l : highScores) {
+            l.setVisible(false);
+        }        
+        label.setEnabled(false);
+        label.setVisible(false);
+        goBack.setEnabled(false);
+        goBack.setVisible(false);
         play.setEnabled(true);
         play.setVisible(true);
         if (db.storesGame()) {
             replay.setEnabled(true);
-        }        
-        replay.setVisible(true);
-        highScore.setEnabled(true);
-        highScore.setVisible(true);
-        window.setBackground(Color.WHITE);
+            replay.setVisible(true);
+            highScore.setEnabled(true);
+            highScore.setVisible(true);
+        }   
+        window.setBackground(Color.WHITE);        
     }
 
-    static void hideMenu() {
+    static void hideMenu() {        
+        label.setEnabled(true);
+        label.setVisible(true);
         play.setEnabled(false);
         play.setVisible(false);
         replay.setEnabled(false);
@@ -172,8 +217,13 @@ public class Tetris implements ActionListener{
         highScore.setEnabled(false);
         highScore.setVisible(false);
         window.setBackground(Color.CYAN);
+        goBack.setEnabled(false);
+        goBack.setVisible(false);
+        for (JLabel l : highScores) {
+            l.setVisible(false);
+        }
     }
-    
+
     void removeLevel(int y) {
         for (int i = 0; i < placed.size(); ++i) {
             for (int j = 0; j < placed.get(i).recs.size(); ++j) {
@@ -190,9 +240,9 @@ public class Tetris implements ActionListener{
                 }
             }
         }
-    } 
-    
-    void removeLevels() {        
+    }
+
+    void removeLevels() {
         for (int y = 0; y < H; y += 20) {
             boolean lineFilled = true;
             for (int x = 0; x < W; x += 20) {
@@ -205,7 +255,7 @@ public class Tetris implements ActionListener{
                 }
                 if (!boxFilled) {
                     lineFilled = false;
-                    break;                    
+                    break;
                 }
             }
             if (lineFilled) {
@@ -216,10 +266,13 @@ public class Tetris implements ActionListener{
         }
     }
 
-    void spawn(Thingy thingy) {        
+    void spawn(Thingy thingy) {
         if (thingy == null) {
-            curr = Generator.getThingy();  
+            curr = Generator.getThingy();
         } else {
+            if (curr.id == thingy.id) {
+                thingy.color = curr.color;
+            }
             curr = thingy;
         }
         for (Rectangle r : curr.recs) {
@@ -230,9 +283,9 @@ public class Tetris implements ActionListener{
                 }
             }
         }
-    } 
-    
-    void startGame(boolean repl) {        
+    }
+
+    void startGame(boolean repl) {
         hideMenu();
         Input.clear();
         placed.clear();
@@ -251,21 +304,20 @@ public class Tetris implements ActionListener{
             spawn(null);
         }
         timer = new Timer(refreshTime, this);
-        timer.start(); 
+        timer.start();
         o("start");
     }
 
-
-    boolean ok = true;
-
     void stopGame() {
         o("stop");
-        replaying = false;
         timer.stop();
-        db.saveGame();        
+        if (!replaying) {
+            db.saveGame();
+        }
+        replaying = false;
         showMenu();
     }
-    
+
     void increaseSpeed() {
         if (ticks > 99) {
             ticks = 0;
@@ -275,18 +327,20 @@ public class Tetris implements ActionListener{
             delay -= 50;
         }
     }
-    
+
     static void draw(Graphics g) {
         placed.forEach((t) -> {
             t.draw(g);
         });
-        shadow = curr.copy();
-        shadow.release();
-        shadow.color = Color.LIGHT_GRAY;
-        shadow.draw(g); 
-        curr.draw(g);     
+        if (curr != null) {
+            shadow = curr.copy();
+            shadow.release();
+            shadow.color = Color.LIGHT_GRAY;
+            shadow.draw(g);
+            curr.draw(g);
+        }        
     }
-    
+
     void replay() {
         replaying = true;
         curr = db.getThingy();

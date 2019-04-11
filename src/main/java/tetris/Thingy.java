@@ -13,8 +13,10 @@ public abstract class Thingy {
     public boolean dropped;
     public long id;
     static long nextId = 0;
+    public char state;
 
     Thingy() {
+        state = '0';
         dropped = true;
         recs = new ArrayList<>();
         color = Generator.getColor();
@@ -26,7 +28,35 @@ public abstract class Thingy {
     public abstract Thingy copy();    
     
     public abstract void rotate();
-    
+
+    static public Thingy getThingy(char type) {
+        Thingy t;
+        switch (type) {
+            case 'J':
+                t = new J();
+                break;
+            case 'T':
+                t = new T();
+                break;
+            case 'L':
+                t = new L();
+                break;   
+            case 'I':
+                t = new I();
+                break;
+            case 'S':
+                t = new S();
+                break;
+            case 'Z':
+                t = new Z();
+                break;   
+            default:
+                t = new I(); 
+        }
+        return t;
+    }
+
+        
     public static ArrayList<Rectangle> copy(ArrayList<Rectangle> src) {
         ArrayList<Rectangle> ret = new ArrayList<>();
         for (Rectangle r : src) {

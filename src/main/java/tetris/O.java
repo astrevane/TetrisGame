@@ -21,16 +21,22 @@ public class O extends Thingy {
         t.recs = copy(recs);
         return t;
     }
-    
-    O() {
-        Rectangle r = new Rectangle(Tetris.W / 2, 0, Tetris.REC_W, Tetris.REC_W);
+
+    void generate(Rectangle r) {
+        if (r == null) {
+            r = new Rectangle(Tetris.W / 2, 0, Tetris.REC_W, Tetris.REC_W);
+        }
         recs.add(r);
-        r = new Rectangle(r.x - Tetris.REC_W, 0, Tetris.REC_W, Tetris.REC_W);
+        r = new Rectangle(r.x - Tetris.REC_W, r.y, Tetris.REC_W, Tetris.REC_W);
         recs.add(r);
         r = new Rectangle(r.x, -Tetris.REC_W, Tetris.REC_W, Tetris.REC_W);
         recs.add(r);
         r = new Rectangle(r.x + Tetris.REC_W, -Tetris.REC_W, Tetris.REC_W, Tetris.REC_W);
         recs.add(r);
+    }
+    
+    O() {
+        generate(null);        
     }
     
 }

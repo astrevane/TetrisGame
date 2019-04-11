@@ -6,10 +6,7 @@ import java.util.ArrayList;
 
 public abstract class TwoStateThingy extends Thingy {
     
-    boolean lays;
-    
     TwoStateThingy() {
-        lays = true;
         generate(recs, null);
     }
 
@@ -30,17 +27,17 @@ public abstract class TwoStateThingy extends Thingy {
                 t = new I();  
         }
         t.recs = copy(recs);
-        t.lays = lays;
+        t.state = state;
         return t;
     }
     
     public abstract void generate(ArrayList<Rectangle> ra, Rectangle r);
     public abstract void generate1(ArrayList<Rectangle> ra, Rectangle r);
-    
+        
     @Override
     public void rotate() {
         ArrayList<Rectangle> nr = new ArrayList<>();
-        if (lays) {
+        if (state == '0') {
             generate1(nr, recs.get(0));            
         } else {
             generate(nr, recs.get(0));      
@@ -49,7 +46,9 @@ public abstract class TwoStateThingy extends Thingy {
         if(checkCollision(nr)) {
             return;
         }
-        lays = lays ? false : true;
+        if (++state > '1') {
+            state = '0';
+        }
         recs = nr;
     }
 }
